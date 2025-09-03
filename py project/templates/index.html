@@ -12,12 +12,10 @@
             transition: transform 0.1s ease;
         }
 
-        /* Button click shrink animation */
         button:active {
             transform: scale(0.95);
         }
 
-        /* Button bounce on hover */
         @keyframes bounce {
 
             0%,
@@ -34,11 +32,9 @@
             animation: bounce 0.5s;
         }
 
-        /* Result div fade and styling */
         #result {
             opacity: 0;
             white-space: pre-line;
-            /* preserve newlines */
             transition: opacity 0.5s ease-in-out;
             font-size: 20px;
             margin-top: 20px;
@@ -48,7 +44,6 @@
             opacity: 1;
         }
 
-        /* Shake animation for losing */
         @keyframes shake {
 
             0%,
@@ -71,7 +66,6 @@
             animation: shake 0.5s;
         }
 
-        /* Pulse animation for win */
         @keyframes pulse {
 
             0%,
@@ -102,10 +96,8 @@
         async function play(choice) {
             const resultDiv = document.getElementById("result");
 
-            // Fade out old text
             resultDiv.style.opacity = 0;
 
-            // Wait for fade out before updating content
             setTimeout(async () => {
                 const response = await fetch("/play", {
                     method: "POST",
@@ -128,23 +120,21 @@
                     `Computer chose: ${data.comp_choice}\n` +
                     `Result: ${data.result}`;
 
-                // Remove previous animation classes
                 resultDiv.classList.remove("shake", "win");
 
-                // Add shake or pulse effect based on result
                 if (data.result.toLowerCase().includes("lose") || data.result.toLowerCase().includes("computer wins")) {
                     resultDiv.classList.add("shake");
                 } else if (data.result.toLowerCase().includes("win")) {
                     resultDiv.classList.add("win");
                 }
 
-                // Show result with fade in
                 resultDiv.classList.add("show");
                 resultDiv.style.opacity = 1;
 
-            }, 500); // match opacity transition duration
+            }, 500); 
         }
     </script>
 </body>
+
 
 </html>
