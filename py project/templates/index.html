@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        button {
+            font-size: 18px;
+            margin: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        /* Button click shrink animation */
+        button:active {
+            transform: scale(0.95);
+        }
+
+        /* Button bounce on hover */
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        button:hover {
+            animation: bounce 0.5s;
+        }
+
+        /* Result div fade and styling */
+        #result {
+            opacity: 0;
+            white-space: pre-line;
+            /* preserve newlines */
+            transition: opacity 0.5s ease-in-out;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        #result.show {
+            opacity: 1;
+        }
+
+        /* Shake animation for losing */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-10px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* Pulse animation for win */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .win {
+            animation: pulse 1s;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Rock Paper Scissors</h2>
+    <button onclick="play('rock')">✊ Rock</button>
+    <button onclick="play('paper')">✋ Paper</button>
+    <button onclick="play('scissors')">✌️ Scissors</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function play(choice) {
+            const resultDiv = document.getElementById("result");
+
+            // Fade out old text
+            resultDiv.style.opacity = 0;
+
+            // Wait for fade out before updating content
+            setTimeout(async () => {
+                const response = await fetch("/play", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ choice: choice })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.innerText = data.error;
+                    resultDiv.classList.remove("shake", "win");
+                    resultDiv.classList.add("show");
+                    resultDiv.style.opacity = 1;
+                    return;
+                }
+
+                resultDiv.innerText =
+                    `You chose: ${data.user_choice}\n` +
+                    `Computer chose: ${data.comp_choice}\n` +
+                    `Result: ${data.result}`;
+
+                // Remove previous animation classes
+                resultDiv.classList.remove("shake", "win");
+
+                // Add shake or pulse effect based on result
+                if (data.result.toLowerCase().includes("lose") || data.result.toLowerCase().includes("computer wins")) {
+                    resultDiv.classList.add("shake");
+                } else if (data.result.toLowerCase().includes("win")) {
+                    resultDiv.classList.add("win");
+                }
+
+                // Show result with fade in
+                resultDiv.classList.add("show");
+                resultDiv.style.opacity = 1;
+
+            }, 500); // match opacity transition duration
+        }
+    </script>
+</body>
+
+</html>
